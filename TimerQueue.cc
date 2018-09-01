@@ -1,6 +1,6 @@
-#ifndef __STDC_LIMIT_MACROS
-#define __STDC_LIMIT_MACROS
-#endif
+//#ifndef __STDC_LIMIT_MACROS
+//#define __STDC_LIMIT_MACROS
+//#endif
 
 #include "TimerQueue.h"
 #include "Logging.h"
@@ -102,23 +102,23 @@ TimerId TimerQueue::addTimer(const TimerCallback& cb, Timestamp when, double int
     return TimerId(std::move(timer), timer->sequence());
 }
 
-void TimerQueue::cancel(TimerId timerId)
+void TimerQueue::cancel(TimerId& timerId)
 {
     loop_->runInLoop(std::bind(&TimerQueue::cancelInLoop, this, timerId));
 }
 
 //void TimerQueue::addTimerInLoop(Timer* timer)
-void TimerQueue::addTimerInLoop(std::unique_ptr<Timer> timer)
+void TimerQueue::addTimerInLoop(std::unique_ptr<Timer>& timer)
 {
     loop_->assertInLoopThread();
-    bool earliestChanged = insert(std::move(timer));
+    bool earliestChanged = insert(timer);
 
     if (earliestChanged) {
         resetTimerfd(timerfd_, timer->expiration());
     }
 }
 
-void TimerQueue::cancelInLoop(TimerId timerId)
+void TimerQueue::cancelInLoop(TimerId& timerId)
 {
     loop_->assertInLoopThread();
     assert(timers_.size() == activeTimers_.size());

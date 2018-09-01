@@ -2,26 +2,25 @@
 #define EVENTLOOP_H
 
 #include <vector>
-
-//#include <boost/any.hpp>
+//#include <any>
 #include <functional>
 #include "NonCopyable.h"
 #include <memory>
-
+#include "Channel.h"
 #include "Mutex.h"
 #include "CurrentThread.h"
-#include "Timestamp.h"
+//#include "Timestamp.h"
 #include "Callbacks.h"
-#include "TimerId.h"
+//#include "TimerId.h"
 
 namespace muduo
 {
 namespace net
 {
 
-class Channel;
-class Poller;
-class TimerQueue;
+//class Channel;
+//class Poller;
+//class TimerQueue;
 
 ///
 /// Reactor, at most one per thread.
@@ -51,7 +50,7 @@ class EventLoop : public noncopyable
         ///
         /// Time when poll returns, usually means data arrival.
         ///
-        Timestamp pollReturnTime() const { return pollReturnTime_; }
+        //Timestamp pollReturnTime() const { return pollReturnTime_; }
 
         int64_t iteration() const { return iteration_; }
 
@@ -72,22 +71,22 @@ class EventLoop : public noncopyable
         /// Runs callback at 'time'.
         /// Safe to call from other threads.
         ///
-        TimerId runAt(const Timestamp& time, const TimerCallback& cb);
+        //TimerId runAt(const Timestamp& time, const TimerCallback& cb);
         ///
         /// Runs callback after @c delay seconds.
         /// Safe to call from other threads.
         ///
-        TimerId runAfter(double delay, const TimerCallback& cb);
+        //TimerId runAfter(double delay, const TimerCallback& cb);
         ///
         /// Runs callback every @c interval seconds.
         /// Safe to call from other threads.
         ///
-        TimerId runEvery(double interval, const TimerCallback& cb);
+        //TimerId runEvery(double interval, const TimerCallback& cb);
         ///
         /// Cancels the timer.
         /// Safe to call from other threads.
         ///
-        void cancel(TimerId timerId);
+        //void cancel(TimerId timerId);
 
         // internal usage
         void wakeup();
@@ -106,20 +105,20 @@ class EventLoop : public noncopyable
         // bool callingPendingFunctors() const { return callingPendingFunctors_; }
         bool eventHandling() const { return eventHandling_; }
 
-        void setContext(const boost::any& context)
-        { 
-            context_ = context; 
-        }
+        //void setContext(const std::any& context)
+        //{ 
+        //    context_ = context; 
+        //}
 
-        const boost::any& getContext() const
-        { 
-            return context_; 
-        }
+        //const std::any& getContext() const
+        //{ 
+        //    return context_; 
+        //}
 
-        boost::any* getMutableContext()
-        { 
-            return &context_; 
-        }
+        //std::any* getMutableContext()
+        //{ 
+        //    return &context_; 
+        //}
 
         static EventLoop* getEventLoopOfCurrentThread();
 
@@ -138,14 +137,14 @@ class EventLoop : public noncopyable
         bool callingPendingFunctors_; /* atomic */
         int64_t iteration_;
         const pid_t threadId_;
-        Timestamp pollReturnTime_;
-        std::unique_ptr<Poller> poller_;
-        std::unique_ptr<TimerQueue> timerQueue_;
+        //Timestamp pollReturnTime_;
+        //std::unique_ptr<Poller> poller_;
+        //std::unique_ptr<TimerQueue> timerQueue_;
         int wakeupFd_;
         // unlike in TimerQueue, which is an internal class,
         // we don't expose Channel to client.
         std::unique_ptr<Channel> wakeupChannel_;
-        boost::any context_;
+        //std::any context_;
 
         // scratch variables
         ChannelList activeChannels_;

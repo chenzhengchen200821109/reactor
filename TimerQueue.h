@@ -39,7 +39,7 @@ namespace net
             /// Must be thread safe. Usually be called from other threads.
             TimerId addTimer(const TimerCallback& cb, Timestamp when, double interval);
 
-            void cancel(TimerId timerId);
+            void cancel(TimerId& timerId);
 
         private:
 
@@ -50,12 +50,12 @@ namespace net
             typedef std::pair<Timestamp, std::unique_ptr<Timer>> Entry;
             typedef std::set<Entry> TimerList;
             //typedef std::pair<Timer*, int64_t> ActiveTimer;
-            typedef std::pair<std::unique<Timer>, int64_t> ActiveTimer;
+            typedef std::pair<std::unique_ptr<Timer>, int64_t> ActiveTimer;
             typedef std::set<ActiveTimer> ActiveTimerSet;
 
             //void addTimerInLoop(Timer* timer);
-            void addTimerInLoop(std::unique_ptr<Timer> timer);
-            void cancelInLoop(TimerId timerId);
+            void addTimerInLoop(std::unique_ptr<Timer>& timer);
+            void cancelInLoop(TimerId& timerId);
             // called when timerfd alarms
             void handleRead();
             // move out all expired timers
@@ -63,7 +63,7 @@ namespace net
             void reset(const std::vector<Entry>& expired, Timestamp now);
 
             //bool insert(Timer* timer);
-            bool insert(std::unique_ptr<Timer> timer);
+            bool insert(std::unique_ptr<Timer>& timer);
 
             EventLoop* loop_;
             const int timerfd_;

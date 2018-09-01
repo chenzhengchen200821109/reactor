@@ -4,7 +4,7 @@
 #include <map>
 #include <vector>
 #include "NonCopyable.h"
-
+#include "Channel.h"
 #include "Timestamp.h"
 #include "EventLoop.h"
 
@@ -13,13 +13,13 @@ namespace muduo
 namespace net
 {
 
-class Channel;
+//class Channel;
 
 ///
 /// Base class for IO Multiplexing
 ///
 /// This class doesn't own the Channel objects.
-class Poller : boost::noncopyable
+class Poller : public muduo::noncopyable
 {
     public:
         typedef std::vector<Channel*> ChannelList;
