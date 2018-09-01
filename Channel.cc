@@ -1,9 +1,7 @@
 #include "Logging.h"
 #include "Channel.h"
 #include "EventLoop.h"
-
 #include <sstream>
-
 #include <poll.h>
 
 using namespace muduo;
@@ -36,7 +34,7 @@ Channel::~Channel()
     }
 }
 
-void Channel::tie(const boost::shared_ptr<void>& obj)
+void Channel::tie(const std::shared_ptr<void>& obj)
 {
     tie_ = obj;
     tied_ = true;
@@ -57,7 +55,7 @@ void Channel::remove()
 
 void Channel::handleEvent(Timestamp receiveTime)
 {
-    boost::shared_ptr<void> guard;
+    std::shared_ptr<void> guard;
     if (tied_) {
         guard = tie_.lock();
         if (guard) {
@@ -72,25 +70,31 @@ void Channel::handleEventWithGuard(Timestamp receiveTime)
 {
     eventHandling_ = true;
     LOG_TRACE << reventsToString();
+    // POLLUP: hang up (output only)
     if ((revents_ & POLLHUP) && !(revents_ & POLLIN)) {
         if (logHup_) {
             LOG_WARN << "fd = " << fd_ << " Channel::handle_event() POLLHUP";
         }
         if (closeCallback_) closeCallback_();
     }
-
+    // POLLNVAL: invalid request: fd not open(output only)
     if (revents_ & POLLNVAL) {
         LOG_WARN << "fd = " << fd_ << " Channel::handle_event() POLLNVAL";
     }
-
+    // POLLERR: error condition (output only)
     if (revents_ & (POLLERR | POLLNVAL)) {
         if (errorCallback_) 
             errorCallback_();
     }
+    // POLLIN: there is data to read
+    // POLLPRI: there is urgent data to read
+    // POLLRDHUP: stream socket peer closed connection, or shut
+    //            down writing half of connection
     if (revents_ & (POLLIN | POLLPRI | POLLRDHUP)) {
         if (readCallback_) 
             readCallback_(receiveTime);
     }
+    // POLLOUT: writing now will not block
     if (revents_ & POLLOUT) {
         if (writeCallback_) 
             writeCallback_();
@@ -98,7 +102,7 @@ void Channel::handleEventWithGuard(Timestamp receiveTime)
     eventHandling_ = false;
 }
 
-// for debug
+// the following member functions used only for debug
 string Channel::reventsToString() const
 {
     return eventsToString(fd_, revents_);

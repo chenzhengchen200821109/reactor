@@ -15,7 +15,7 @@ class EventLoop;
 
 ///
 /// A selectable I/O channel.
-///
+/// Each Channel object manage only one event
 /// This class doesn't own the file descriptor.
 /// The file descriptor could be a socket,
 /// an eventfd, a timerfd, or a signalfd
@@ -48,7 +48,7 @@ class Channel : public noncopyable
 
         /// Tie this channel to the owner object managed by shared_ptr,
         /// prevent the owner object being destroyed in handleEvent.
-        void tie(const boost::shared_ptr<void>&);
+        void tie(const std::shared_ptr<void>&);
 
         int fd() const { return fd_; }
         int events() const { return events_; }
@@ -89,7 +89,7 @@ class Channel : public noncopyable
 
         EventLoop* loop_;
         const int  fd_;
-        int events_;
+        int events_; 
         int revents_; // it's the received event types of epoll or poll
         int index_; // used by Poller.
         bool logHup_;
